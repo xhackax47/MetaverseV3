@@ -1,0 +1,5 @@
+Verison: 3.0.7 Change Log 
+
+Added:
+    statebag support
+    'persistent-vehicles/respawned-vehicle' client broadcasted event when a client spawns a persistent vehicle

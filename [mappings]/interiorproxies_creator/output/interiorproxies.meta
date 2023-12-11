@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SInteriorOrderData>
+	<startFrom value="2809" />
+	<proxies>
+		<!-- ./input/mapping_mcbar -->
+		<Item>jorouksmap</Item>
+		<Item>lr_cs4_06</Item>
+		<Item>lr_cs4_06_strm_0</Item>
+		<Item>lr_cs4_roads</Item>
+		<Item>lr_cs4_roads_strm_2</Item>
+	</proxies>
+</SInteriorOrderData>

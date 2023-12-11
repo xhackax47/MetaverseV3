@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="nui://game/ui/jquery.js" type="text/javascript"></script>
+  <style type="text/css">
+
+    #dj {
+      display: none;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%,-50%);
+
+      background-color: rgba(0,0,0,0.7);
+      padding: 10px;
+      border-radius: 10px;      
+    }
+
+    #owner {
+      display: none;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%,-50%);
+
+      background-color: rgba(0,0,0,0.7);
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 100%;
+
+      background-color: rgba(30,30,30,1.0);
+      padding-left: 20px;
+      padding-right: 20px;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      color: white;
+    }
+
+    hr {
+      position: relative;
+      width: 100%;
+    }
+
+    select {
+      margin-bottom: 10px;
+    }
+
+    input[type=range] {
+      margin-bottom: 10px;
+    }
+
+    label {
+      margin-bottom: 5px;
+    }
+
+    input[type=text] {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="dj">
+    <div class="container">
+      <hr>
+      <label for="url">Song Url:</label>
+      <input type='text' id="url">
+      <hr>
+
+      <label for="volume">Volume:</label>
+      <input id="volume" type='range' min=0.0 max=1.0 value=0.0 step=0.1>
+      <hr>
+
+      <button onclick="Submit()">Submit</button>
+      <hr>
+      <button onclick="Cancel()">Close</button>
+      <hr>
+    </div>    
+  </div>
+
+  <div id="owner">
+    <div class="container">
+      <hr>
+      <label for="timecycle">Timecycle:</label>
+      <select name="Timecycle" id="timecycle" size=5>
+        <option value="false">None</option>
+      </select>
+      <hr>
+
+      <label for="timecycle-strength">Timecycle Strength</label>
+      <input id="timecycle-strength" type='range' min=0.0 max=5.0 value=0.0 step=0.1>
+      <hr>
+
+      <label for="secondary-timecycle">Secondary Timecycle:</label>
+      <select name="Secondary Timecycle" id="secondary-timecycle" size=5>
+        <option value="false">None</option>
+      </select>
+      <hr>
+
+      <label for="secondary-timecycle-strength">Secondary Timecycle Strength</label>
+      <input id="secondary-timecycle-strength" type='range' min=0.0 max=5.0 value=0.0 step=0.1>
+      <hr>
+
+      <label for="cam-shake">Cam Shake:</label>
+      <select name="cam-shake" id="cam-shake" size=5>
+        <option value="false">None</option>
+      </select>
+      <hr>
+
+      <label for="cam-shake-strength">Cam Shake Strength</label>
+      <input id="cam-shake-strength" type='range' min=0.0 max=5.0 value=0.0 step=0.1>
+      <hr>
+
+      <label for="draw-cube-count">Draw Box Count</label>
+      <input id="draw-cube-count" type='range' min=0 max=30 value=0 step=1>
+      <hr>
+
+      <label for="motion-blur"> Enable Motion Blur</label><br>
+      <input type="checkbox" id="motion-blur" name="motion-blur" value="false" onclick="SetMb(this)">
+      <hr>
+
+      <button onclick="Save()">Save</button>
+      <hr>
+      <button onclick="Cancel()">Cancel</button>
+      <hr>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var res = false;
+
+    var owner   = document.getElementById('owner');
+    var dj      = document.getElementById('dj');
+    var tc      = document.getElementById('timecycle');
+    var tcs     = document.getElementById('timecycle-strength');
+    var stc     = document.getElementById('secondary-timecycle');
+    var stcs    = document.getElementById('secondary-timecycle-strength');
+    var cs      = document.getElementById('cam-shake');
+    var css     = document.getElementById('cam-shake-strength');
+    var mb      = document.getElementById('motion-blur');
+    var dcc     = document.getElementById('draw-cube-count');
+    var url     = document.getElementById('url');
+    var volume  = document.getElementById('volume');
+
+    Config = function(data) {
+      res = data.res;
+
+      for (var k=0;k<data.timecycles.length;k++) {
+        var opt         = document.createElement('option');
+        opt.value       = data.timecycles[k];
+        opt.innerHTML   = data.timecycles[k];
+
+        var opt2        = opt.cloneNode();
+        opt2.value      = data.timecycles[k];
+        opt2.innerHTML  = data.timecycles[k];
+
+        tc.appendChild(opt);
+        stc.appendChild(opt2);
+      }
+
+      for (var k=0;k<data.camshakes.length;k++) {
+        var opt = document.createElement('option');
+        opt.value     = data.camshakes[k];
+        opt.innerHTML = data.camshakes[k];
+
+        cs.appendChild(opt);
+      }
+
+      $.post(`https://${res}/ready`);
+    }
+
+    SetOpts = function(opts) {      
+      tc.value    = opts.timecycle;
+      tcs.value   = opts.timecycle_strength;
+
+      for (var k=0;k<tc.childNodes.length;k++) {
+        var v = tc.childNodes[k];
+        if (v.value == opts.timecycle) {
+          v.click();
+          break;
+        }
+      }
+
+      stc.value   = opts.secondary_timecycle;
+      stcs.value  = opts.secondary_timecycle_strength;
+
+      for (var k=0;k<stc.childNodes.length;k++) {
+        var v = stc.childNodes[k];
+        if (v.value == opts.timecycle) {
+          v.click();
+          break;
+        }
+      }
+
+      cs.value    = opts.cam_shake;
+      css.value   = opts.cam_shake_strength;
+
+      dcc.value   = opts.draw_cubes;
+
+      mb.value    = opts.motion_blur;
+      mb.checked  = opts.motion_blur;
+    }
+
+    SetDj = function() {
+
+    }
+
+    SetMb = function(e) {
+      e.value = e.checked;     
+    }
+
+    Save = function() {
+      $.post(`https://${res}/save`,JSON.stringify({
+        timecycle:(tc.value == "false" ? false : tc.value),
+        timecycle_strength:parseFloat(tcs.value),
+        secondary_timecycle:(stc.value == "false" ? false : stc.value),
+        secondary_timecycle_strength:parseFloat(stcs.value),
+        cam_shake:(cs.value == "false" ? false : cs.value),
+        cam_shake_strength:parseFloat(css.value),
+        draw_cubes:(dcc.value == 0 ? false : parseInt(dcc.value)),
+        motion_blur:(mb.value == "false" ? false : true)
+      }));
+      owner.style.display = "none";
+      dj.style.display = "none";
+    }
+
+    Cancel = function() {
+      $.post(`https://${res}/close`);
+      owner.style.display = "none";
+      dj.style.display = "none";
+    }
+
+    Submit = function() {
+      $.post(`https://${res}/submit`,JSON.stringify({
+        song:url.value,
+        volume:parseFloat(volume.value)
+      }));
+    }
+
+    window.addEventListener('message',function(event) {
+      switch (event.data.type) {
+        case "Config":
+          Config(event.data.data);
+        break;
+
+        case "OpenController":
+          SetOpts(event.data.data);
+          owner.style.display = "block";
+          dj.style.display = "none";
+        break;
+
+        case "OpenDj":
+          SetDj(event.data.data);
+          dj.style.display = "block";
+          owner.style.display = "none";
+        break;
+
+        case "Close":
+          owner.style.display = "none";
+          dj.style.display = "none";
+        break;
+      }
+    })
+  </script>
+</body>
+</html>
